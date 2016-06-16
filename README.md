@@ -3,6 +3,7 @@ SMOOTHED GRADIENT FOR STOCHASTIC VARIATIONAL INFERENCE
 
 Hojae Choi
 hojae.choi@kaist.ac.kr
+
 (C) Copyright 2016, Hojae Choi
 
 This is free software, you can redistribute it and/or modify it under
