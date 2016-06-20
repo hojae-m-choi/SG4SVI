@@ -32,5 +32,16 @@ in latent dirichlet allocation (LDA) model presented in the paper
 This code is based on the project of blei-lab/onlineldavb (https://github.com/blei-lab/onlineldavb)
 
 File provided:
-T.B.F
+* batchldavb.py :
+* calculate_prop.py :
 
+
+------------------------------------------------------------------------
+ # Acknowledgement
+
+ This code was implemented during final project of 2016 spring EE531 : Statistical Learning Theory, KAIST
+ Advisor : Changdong Yoo
+ Team members : Hojae Choi, Soorin Yim, Yunwon Kang
+
+ Soorin Yim, Yunwon Kang help me understand the fundamentals and theoretical base of
+ variational inference, stochastic optimization and latent dirichlet allocation.
