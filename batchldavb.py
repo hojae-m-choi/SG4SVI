@@ -192,21 +192,9 @@ class batchLDA:
         sstats = sstats * self._expElogbeta
 
         sstats = sstats*self._D/batchD
-        # Add sufficient statics in last of Q (deque)
-        self._Q.append(sstats)
-        # Remove last element when length L has been reached
-        if self._Q.__len__() > self._L:
-            sstats_last = self._Q.popleft()
-            # Update Lambda, using stored sufficient statistics
-            self._sstats = self._sstats + (sstats - sstats_last)/self._L
-        else:
-            sstats_last = 0
-            # Update Lambda, using stored sufficient statistics
-            self._sstats = ( self._sstats * (self._Q.__len__() -1) + sstats - sstats_last) / self._Q.__len__()
-        sstats = self._sstats
+
 
         return((gamma, sstats))
-
 
     def do_e_step_docs(self, docs):
         """
@@ -232,7 +220,6 @@ class batchLDA:
         (wordids, wordcts) = parse_doc_list(docs, self._vocab)
 
         return self.do_e_step(wordids, wordcts)
-
 
     def update_lambda_docs(self, docs):
         """
@@ -264,6 +251,20 @@ class batchLDA:
         # mini-batch. This also returns the information about phi that
         # we need to update lambda.
         (gamma, sstats) = self.do_e_step_docs(docs)
+
+        # Add sufficient statics in last of Q (deque)
+        self._Q.append(sstats)
+        # Remove last element when length L has been reached
+        if self._Q.__len__() > self._L:
+            sstats_last = self._Q.popleft()
+            # Update Lambda, using stored sufficient statistics
+            self._sstats = self._sstats + (sstats - sstats_last) / self._L
+        else:
+            sstats_last = 0
+            # Update Lambda, using stored sufficient statistics
+            self._sstats = (self._sstats * (self._Q.__len__() - 1) + sstats - sstats_last) / self._Q.__len__()
+        sstats = self._sstats
+
         # Estimate held-out likelihood for current values of lambda.
         bound = self.approx_bound_docs(docs, gamma)
         # Update lambda based on documents.(new)
@@ -475,11 +476,11 @@ def main():
         repeat = 1
         recset = set(map(int, n.logspace(0, 3.35, num=100, base=10.0).tolist()))
         for j in range(start, repeat):
-            model = batchLDA(vocab, K, 2e3,  # original : 100000
-                                alpha, eta, 0.01, kappa, L)  # 0.1, 0.01, 1, 0.75)
+            model = batchLDA(vocab, K, 2e3,
+                                alpha, eta, 0.01, kappa, L)
             for i in range(int(2e3)):
                 # print i
-                # rand_ind = n.random.randint(int(2e3), size = S)
+                # rand_ind = n.random.randint(int(2e3), size = S) # for
                 rand_ind = range(int(2e3))  # for full sufficient statistics
                 wordids = [docs.docs[idx].words for idx in rand_ind]
                 wordcts = [docs.docs[idx].counts for idx in rand_ind]
@@ -489,6 +490,7 @@ def main():
                 # n.savetxt('lambda-%d/lambda-%d-%d' % (L, L, i) , model._lambda.T)
                 if i in recset:
                     grad = model._grad
+                    # gradient-1 folder should pre-exist on pwd
                     n.savetxt('gradient-%d/gradient-%d-%d' % (L, 31, i), grad.T) # for full sufficient statistics
                 # if j == 0:
                 #     grad = model._grad
