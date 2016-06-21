@@ -38,10 +38,12 @@ File provided:
 
 ------------------------------------------------------------------------
 
- # Acknowledgement
+# Acknowledgement
 
  This code was implemented during final project of 2016 spring EE531 : Statistical Learning Theory, KAIST
+
  Advisor : Changdong Yoo
+
  Team members : Hojae Choi, Soorin Yim, Yunwon Kang
 
  Soorin Yim, Yunwon Kang help me understand the fundamentals and theoretical base of
