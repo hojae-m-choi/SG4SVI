@@ -13,6 +13,8 @@ def calculate_prob(wordids, wordcts, gamma, lamb):
             cts = wordcts[d]
             Ebeta = n.dot(dirichlet_expectation(lamb)[:,ids], cts )
             predprob += n.dot(dirichlet_expectation(gamma), Ebeta)
+            if d % 100 == 0:
+                print 'Now, %d iter running' % d
     else:
         ids = wordids
         cts = wordcts
@@ -42,10 +44,11 @@ def pred_prob( wordids, wordcts, gamma, lamb):
             else:
                 tmpids.append(wordids[i])
                 tmpcts.append(wordcts[i])
-
-        predprob = Parallel(n_jobs=num_cores, verbose=1000, pre_dispatch='4*n_jobs')(
-            delayed(calculate_prob)(wordids, wordcts, gamma, lamb)
-            for wordids, wordcts in word_list)
+        word_list = [(tmpids[j], tmpcts[j]) for j in range(tmpids.__len__())]
+        # possible option : verbose=1000
+        predprob = Parallel(n_jobs=num_cores, pre_dispatch='4*n_jobs')(
+            delayed(calculate_prob)( ids, cts, gamma, lamb)
+            for ids, cts in word_list)
         predprob = n.sum(predprob)
     else:
         predprob = calculate_prob(wordids, wordcts, gamma, lamb)
@@ -92,7 +95,7 @@ def main():
             (gamma, sstat) = model.do_e_step(test1_wordids, test1_wordcts)
             # calculate the predictive probability with others of test set.
             predprob = pred_prob(test2_wordids, test2_wordcts, gamma, model._lambda)
-            with open('predprob-%d.csv' % L, 'wa') as file:
+            with open('predprob-%d.csv' % L, 'a') as file:
                 wr = csv.writer(file)
                 wr.writerow([i, predprob])
             print 'result of %d-th iteration was recorded in file' % i
